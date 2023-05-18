@@ -1,7 +1,9 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 
+import { DbEvent } from './types';
 import { KafkaClientProxyName, SUBSCRIBED_TOPIC } from './client.module';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ConsumerService implements OnModuleInit {
@@ -14,9 +16,9 @@ export class ConsumerService implements OnModuleInit {
     await this.client.connect();
   }
 
-  async doSomething(name: string, age: number): Promise<string> {
-    const data = { name: name.toUpperCase(), age: age+1 };
-    this.client.emit('info', JSON.stringify(data));
-    return 'Hello World!';
+  doSomething(evt: DbEvent): Observable<string> {
+    const payload = JSON.stringify(evt);
+    console.log(payload);
+    return this.client.emit('info', payload);
   }
 }
